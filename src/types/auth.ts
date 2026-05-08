@@ -24,3 +24,8 @@ export interface Session {
     role: "admin" | "superadmin";
   } | null;
 }
+
+export interface refreshResponse {
+  access_token: string;
+  inactivity_logout_days: number;
+}
