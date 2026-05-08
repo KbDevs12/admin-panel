@@ -4,6 +4,7 @@ export interface LoginPayload {
 }
 
 export interface LoginResponse {
+  name: string;
   access_token: string;
   token_type: string;
   expires_in: number;
