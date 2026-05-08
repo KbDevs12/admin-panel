@@ -1,9 +1,10 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useTransition } from "react";
 import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { LoginAdmin } from "@/app/login/action";
 import { LoginSchema } from "@/lib/validations/auth.schema";
 import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
@@ -17,7 +18,7 @@ import {
 } from "../ui/card";
 
 export default function LoginForm() {
-  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
   const form = useForm({
     defaultValues: {
@@ -28,50 +29,31 @@ export default function LoginForm() {
       onSubmit: LoginSchema,
     },
     onSubmit: async ({ value }) => {
-      // Simpan ID toast untuk di-update nanti (biar ngga numpuk)
       const toastId = toast.loading("Logging in...", {
         position: "top-right",
       });
 
-      try {
-        const baseUrl = process.env.NEXT_PUBLIC_URL || "";
-        const response = await fetch(`${baseUrl}/api/login`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(value),
-        });
+      startTransition(async () => {
+        try {
+          await LoginAdmin(value);
+          toast.success("Login successful", {
+            id: toastId,
+            position: "top-right",
+          });
+        } catch (error) {
+          let message = "An error occurred during login. Please try again.";
 
-        const data = await response.json();
+          if (error instanceof Error) {
+            message = error.message;
+          }
 
-        if (!response.ok) {
-          throw new Error(data.message || "Invalid credentials");
+          toast.error("Login failed", {
+            id: toastId,
+            description: message,
+            position: "top-right",
+          });
         }
-        toast.success("Login successful!", {
-          id: toastId,
-          description: "Welcome back!",
-          position: "top-right",
-        });
-
-        router.push("/dashboard");
-        router.refresh();
-      } catch (error: unknown) {
-        let errorMessage = "An error occurred. Please try again.";
-
-        if (error instanceof Error) {
-          errorMessage = error.message;
-        } else if (typeof error === "string") {
-          errorMessage = error;
-        }
-
-        toast.error("Login failed", {
-          id: toastId,
-          description: errorMessage,
-          position: "top-right",
-          className: "max-w-sm flex flex-col gap-2",
-        });
-      }
+      });
     },
   });
 
@@ -112,7 +94,7 @@ export default function LoginForm() {
                         aria-invalid={isInvalid}
                         placeholder="your@example.com"
                         autoComplete="on"
-                        disabled={form.state.isSubmitting}
+                        disabled={isPending}
                       />
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />
@@ -139,7 +121,7 @@ export default function LoginForm() {
                         aria-invalid={isInvalid}
                         placeholder="********"
                         autoComplete="off"
-                        disabled={form.state.isSubmitting}
+                        disabled={isPending}
                       />
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />
@@ -157,9 +139,9 @@ export default function LoginForm() {
               type="submit"
               form="login-form"
               className="w-full"
-              disabled={form.state.isSubmitting}
+              disabled={isPending}
             >
-              {form.state.isSubmitting ? "Logging in..." : "Login"}
+              {isPending ? "Logging in..." : "Login"}
             </Button>
           </Field>
         </CardFooter>
