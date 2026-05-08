@@ -41,9 +41,11 @@ export default function RootLayout({
         jetbrainsMono.variable,
       )}
     >
-      <body className="min-h-full flex flex-col max-w-7xl mx-auto">
-        {children}
-        <Toaster />
+      <body suppressHydrationWarning>
+        <main className="min-h-full flex flex-col max-w-7xl mx-auto">
+          {children}
+          <Toaster />
+        </main>
       </body>
     </html>
   );

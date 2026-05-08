@@ -29,5 +29,5 @@ export async function loginAdmin(payload: LoginPayload) {
     res.data.expires_in,
   );
 
-  redirect("/dashboard");
+  return { ok: true };
 }

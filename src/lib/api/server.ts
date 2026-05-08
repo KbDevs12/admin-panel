@@ -12,7 +12,7 @@ export async function api<T = unknown>(
   let response: Response;
 
   try {
-    response = await fetch(`${process.env.API_URL}${endpoint}`, {
+    response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${endpoint}`, {
       ...options,
       headers: {
         "Content-Type": "application/json",

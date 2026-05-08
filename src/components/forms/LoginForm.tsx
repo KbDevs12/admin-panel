@@ -1,10 +1,12 @@
 "use client";
 
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { LoginAdmin } from "@/app/login/action";
+import { loginAdmin } from "@/actions/auth/login-admin";
 import { LoginSchema } from "@/lib/validations/auth.schema";
 import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
@@ -19,6 +21,7 @@ import {
 
 export default function LoginForm() {
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const form = useForm({
     defaultValues: {
@@ -35,12 +38,18 @@ export default function LoginForm() {
 
       startTransition(async () => {
         try {
-          await LoginAdmin(value);
+          await loginAdmin(value);
           toast.success("Login successful", {
             id: toastId,
             position: "top-right",
           });
+          router.push("/dashboard");
         } catch (error) {
+          if (isRedirectError(error)) {
+            toast.dismiss(toastId);
+            router.refresh();
+            return;
+          }
           let message = "An error occurred during login. Please try again.";
 
           if (error instanceof Error) {

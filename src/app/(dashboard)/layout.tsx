@@ -1,0 +1,15 @@
+import { redirect } from "next/navigation";
+
+import { refreshSession } from "@/actions/auth/refresh-session";
+
+export default async function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex min-h-screen">
+      <main className="flex-1 p-6">{children}</main>
+    </div>
+  );
+}
