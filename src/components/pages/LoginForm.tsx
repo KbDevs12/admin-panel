@@ -27,18 +27,47 @@ export default function LoginForm() {
     validators: {
       onSubmit: LoginSchema,
     },
-    onSubmit: async (values) => {
+    onSubmit: async ({ value }) => {
+      // Simpan ID toast untuk di-update nanti (biar ngga numpuk)
+      const toastId = toast.loading("Logging in...", {
+        position: "top-right",
+      });
+
       try {
-        toast.loading("Logging in...", {
-          description: (
-            <pre className="mt-2">{JSON.stringify(values, null, 2)}</pre>
-          ),
-          position: "top-right",
-          className: "max-w-sm flex flex-col gap-2",
+        const baseUrl = process.env.NEXT_PUBLIC_URL || "";
+        const response = await fetch(`${baseUrl}/api/login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(value),
         });
-      } catch (error) {
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || "Invalid credentials");
+        }
+        toast.success("Login successful!", {
+          id: toastId,
+          description: "Welcome back!",
+          position: "top-right",
+        });
+
+        router.push("/dashboard");
+        router.refresh();
+      } catch (error: unknown) {
+        let errorMessage = "An error occurred. Please try again.";
+
+        if (error instanceof Error) {
+          errorMessage = error.message;
+        } else if (typeof error === "string") {
+          errorMessage = error;
+        }
+
         toast.error("Login failed", {
-          description: "Please check your credentials and try again.",
+          id: toastId,
+          description: errorMessage,
           position: "top-right",
           className: "max-w-sm flex flex-col gap-2",
         });
@@ -60,6 +89,7 @@ export default function LoginForm() {
             id="login-form"
             onSubmit={(e) => {
               e.preventDefault();
+              e.stopPropagation();
               form.handleSubmit();
             }}
           >
@@ -82,6 +112,7 @@ export default function LoginForm() {
                         aria-invalid={isInvalid}
                         placeholder="your@example.com"
                         autoComplete="on"
+                        disabled={form.state.isSubmitting}
                       />
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />
@@ -108,6 +139,7 @@ export default function LoginForm() {
                         aria-invalid={isInvalid}
                         placeholder="********"
                         autoComplete="off"
+                        disabled={form.state.isSubmitting}
                       />
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />
@@ -121,8 +153,13 @@ export default function LoginForm() {
         </CardContent>
         <CardFooter>
           <Field orientation="horizontal">
-            <Button type="submit" form="login-form" className="w-full">
-              Login
+            <Button
+              type="submit"
+              form="login-form"
+              className="w-full"
+              disabled={form.state.isSubmitting}
+            >
+              {form.state.isSubmitting ? "Logging in..." : "Login"}
             </Button>
           </Field>
         </CardFooter>
