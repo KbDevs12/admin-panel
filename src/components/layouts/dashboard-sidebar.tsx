@@ -65,7 +65,7 @@ export default function DashboardSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarContent className="flex flex-col h-full">
+      <SidebarContent className="flex flex-col h-full items-center">
         {!isCollapsed && (
           <SidebarHeader>
             <h1 className="text-lg font-bold">Cahaya Admin</h1>
@@ -163,19 +163,21 @@ export default function DashboardSidebar() {
           })}
         </SidebarMenu>
         <SidebarSeparator />
-        <form action={logoutAdmin}>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              type="submit"
-              className={`w-full flex flex-row items-center text-red-600 hover:bg-red-50 ${
-                isCollapsed ? "justify-center gap-0" : "gap-4"
-              }`}
-            >
-              <LogOut className="shrink-0" />
-              {!isCollapsed && <span className="text-sm">Logout</span>}
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </form>
+        <SidebarMenu>
+          <form action={logoutAdmin}>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                type="submit"
+                className={`w-full flex flex-row items-center text-red-600 hover:bg-red-50 ${
+                  isCollapsed ? "justify-center gap-0" : "gap-4"
+                }`}
+              >
+                <LogOut className="shrink-0" />
+                {!isCollapsed && <span className="text-sm">Logout</span>}
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </form>
+        </SidebarMenu>
         {!isCollapsed && (
           <SidebarFooter>
             <p className="text-xs text-muted-foreground">
