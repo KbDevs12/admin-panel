@@ -45,3 +45,6 @@ next-env.d.ts
 
 # any zip files
 *.zip
+
+# any sql files
+*.sql
