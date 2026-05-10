@@ -5,3 +5,30 @@ export interface DailyReport {
   pending_bookings: number;
   cancelled_bookings: number;
 }
+
+export interface RevenueChartPoint {
+  date: string;
+  revenue: number;
+}
+
+export interface RecentPendingBooking {
+  booking_id: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  customer_name: string;
+  field_name: string;
+  amount: number;
+  booked_at: string;
+}
+
+export interface DashboardData {
+  today: string;
+  total_bookings: number;
+  pending_payment: number;
+  paid_bookings: number;
+  revenue_today: number;
+  total_users: number;
+  revenue_chart: RevenueChartPoint[];
+  recent_pending: RecentPendingBooking[];
+}
