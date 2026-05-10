@@ -1,6 +1,6 @@
 "use client";
 
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import {
   ChartContainer,
   ChartTooltip,
@@ -10,6 +10,8 @@ import {
 import { format, parseISO } from "date-fns";
 import { id } from "date-fns/locale";
 import type { RevenueChartPoint } from "@/types/report";
+import { BarChartIcon } from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
 
 import { FormatRupiahV2 } from "@/lib/utility/format-rupiah";
 
@@ -25,6 +27,16 @@ export function RevenueBarChart({ data }: { data: RevenueChartPoint[] }) {
     ...d,
     label: format(parseISO(d.date), "dd MMM", { locale: id }),
   }));
+
+  if (data.length === 0) {
+    return (
+      <EmptyState
+        icon={BarChartIcon}
+        title="Tidak ada data pendapatan"
+        description="Data pendapatan 7 hari terakhir akan muncul di sini setelah ada transaksi yang masuk."
+      />
+    );
+  }
 
   return (
     <ChartContainer config={chartConfig} className="min-h-55 w-full">
