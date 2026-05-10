@@ -5,7 +5,7 @@ export const ENDPOINTS = {
   },
 
   ADMIN: {
-    DASHBOARD: "/aopi/v1/admin/dashboard",
+    DASHBOARD: "/api/v1/admin/dashboard",
     BOOKINGS: "/api/v1/admin/bookings",
     BOOKING_DETAIL: (id: string) => `/api/v1/admin/bookings/${id}`,
 
