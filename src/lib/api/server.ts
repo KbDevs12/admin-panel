@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 import type { ApiResponse } from "@/types/api";
 
@@ -26,9 +27,12 @@ export async function api<T = unknown>(
   options?: RequestInit,
 ): Promise<ApiResponse<T>> {
   let response: Response;
+
   try {
     response = await fetchApi<T>(endpoint, options);
-  } catch {
+  } catch (error) {
+    if (isRedirectError(error)) throw error;
+
     return {
       ok: false,
       status: 0,
@@ -48,7 +52,8 @@ export async function api<T = unknown>(
 
     try {
       response = await fetchApi<T>(endpoint, options);
-    } catch {
+    } catch (error) {
+      if (isRedirectError(error)) throw error;
       redirect("/login");
     }
   }
