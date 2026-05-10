@@ -33,6 +33,7 @@ import {
 } from "../ui/table";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { EmptyState } from "../ui/empty-state";
 
 interface DataTableProps<TData> {
   data: TData[];
@@ -57,7 +58,7 @@ export function DataTable<TData>({
   pageSize = 10,
   actions,
   emptyTitle = "Tidak ada data",
-  emptyDescription = "Data yang Anda cari tidak ditemukan.",
+  emptyDescription,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -77,7 +78,6 @@ export function DataTable<TData>({
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     ...(paginated && {
       getPaginationRowModel: getPaginationRowModel(),
       initialState: { pagination: { pageSize } },
@@ -96,9 +96,9 @@ export function DataTable<TData>({
                 className="pl-9"
                 value={
                   searchColumns
-                    ? (table
+                    ? ((table
                         .getColumn(searchColumns)
-                        ?.getFilterValue() as string)
+                        ?.getFilterValue() as string) ?? "")
                     : globalFilter
                 }
                 onChange={(e) => {
@@ -129,7 +129,7 @@ export function DataTable<TData>({
                   return (
                     <TableHead key={header.id}>
                       {header.isPlaceholder ? null : canSort ? (
-                        <Button
+                        <button
                           className="flex items-center gap-1.5 hover:text-foreground transition-colors"
                           onClick={header.column.getToggleSortingHandler()}
                         >
@@ -144,7 +144,7 @@ export function DataTable<TData>({
                           ) : (
                             <ArrowUpDown className="size-3 opacity-40" />
                           )}
-                        </Button>
+                        </button>
                       ) : (
                         flexRender(
                           header.column.columnDef.header,
@@ -162,15 +162,11 @@ export function DataTable<TData>({
             {table.getRowModel().rows.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={columns.length}>
-                  <div className="flex flex-col items-center justify-center gap-2 py-12 text-center">
-                    <Inbox className="size-8 text-muted-foreground" />
-                    <p className="text-sm font-medium">{emptyTitle}</p>
-                    {emptyDescription && (
-                      <p className="text-xs text-muted-foreground max-w-xs">
-                        {emptyDescription}
-                      </p>
-                    )}
-                  </div>
+                  <EmptyState
+                    icon={Inbox}
+                    title={emptyTitle}
+                    description={emptyDescription}
+                  />
                 </TableCell>
               </TableRow>
             ) : (
@@ -200,17 +196,17 @@ export function DataTable<TData>({
           </span>
           <div className="flex items-center gap-1">
             <Button
-              variant={"outline"}
-              size={"icon"}
+              variant="outline"
+              size="icon"
               className="size-7"
               onClick={() => table.setPageIndex(0)}
               disabled={!table.getCanPreviousPage()}
             >
-              <ChevronLeft className="size-3" />
+              <ChevronsLeft className="size-3" />
             </Button>
             <Button
-              variant={"outline"}
-              size={"icon"}
+              variant="outline"
+              size="icon"
               className="size-7"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
@@ -218,8 +214,8 @@ export function DataTable<TData>({
               <ChevronLeft className="size-3" />
             </Button>
             <Button
-              variant={"outline"}
-              size={"icon"}
+              variant="outline"
+              size="icon"
               className="size-7"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
@@ -227,13 +223,13 @@ export function DataTable<TData>({
               <ChevronRight className="size-3" />
             </Button>
             <Button
-              variant={"outline"}
-              size={"icon"}
+              variant="outline"
+              size="icon"
               className="size-7"
               onClick={() => table.setPageIndex(table.getPageCount() - 1)}
               disabled={!table.getCanNextPage()}
             >
-              <ChevronRight className="size-3" />
+              <ChevronsRight className="size-3" />
             </Button>
           </div>
         </div>
