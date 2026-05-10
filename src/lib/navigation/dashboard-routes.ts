@@ -1,5 +1,14 @@
 import { SidebarMenu } from "@/types/sidebar";
-import { LayoutDashboard, Calendar, Users, MapPin } from "lucide-react";
+import {
+  Bell,
+  Calendar,
+  CreditCard,
+  LayoutDashboard,
+  MapPin,
+  Users,
+  UserCog,
+  BarChart3,
+} from "lucide-react";
 
 export const sidebarMenu: SidebarMenu[] = [
   {
@@ -22,6 +31,11 @@ export const sidebarMenu: SidebarMenu[] = [
     ],
   },
   {
+    title: "Payments",
+    icon: CreditCard,
+    path: "/payments",
+  },
+  {
     title: "Fields",
     icon: MapPin,
     subMenu: [
@@ -39,5 +53,29 @@ export const sidebarMenu: SidebarMenu[] = [
     title: "Users",
     icon: Users,
     path: "/users",
+  },
+  {
+    title: "Admin Accounts",
+    icon: UserCog,
+    subMenu: [
+      {
+        title: "All Admins",
+        path: "/admins",
+      },
+      {
+        title: "Create Admin",
+        path: "/admins/create",
+      },
+    ],
+  },
+  {
+    title: "Reports",
+    icon: BarChart3,
+    path: "/reports",
+  },
+  {
+    title: "Notifications",
+    icon: Bell,
+    path: "/notifications",
   },
 ];
