@@ -57,6 +57,7 @@ export const sidebarMenu: SidebarMenu[] = [
   {
     title: "Admin Accounts",
     icon: UserCog,
+    roles: ["superadmin"],
     subMenu: [
       {
         title: "All Admins",
