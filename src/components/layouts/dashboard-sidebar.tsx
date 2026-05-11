@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronDown, LogOut } from "lucide-react";
@@ -19,38 +19,64 @@ import {
 
 import { sidebarMenu } from "@/lib/navigation/dashboard-routes";
 import { logoutAdmin } from "@/actions/auth/logout-admin";
+import type {
+  DashboardRole,
+  SidebarMenu as SidebarMenuItemType,
+} from "@/types/sidebar";
 
-export default function DashboardSidebar() {
+function canSeeMenu(item: SidebarMenuItemType, role?: DashboardRole) {
+  if (!item.roles || item.roles.length === 0) return true;
+  return role ? item.roles.includes(role) : false;
+}
+
+function filterMenuByRole(items: SidebarMenuItemType[], role?: DashboardRole) {
+  return items
+    .filter((item) => canSeeMenu(item, role))
+    .map((item) => ({
+      ...item,
+      subMenu: item.subMenu?.filter((subItem) => canSeeMenu(subItem, role)),
+    }))
+    .filter((item) => item.path || !item.subMenu || item.subMenu.length > 0);
+}
+
+export default function DashboardSidebar({
+  currentUserRole,
+}: {
+  currentUserRole?: DashboardRole;
+}) {
   const pathname = usePathname();
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
+  const [manualOpen, setManualOpen] = useState<Record<string, boolean>>({});
 
-  const [open, setOpen] = useState<Record<string, boolean>>({});
-  const [mounted, setMounted] = useState(false);
+  const visibleMenu = useMemo(
+    () => filterMenuByRole(sidebarMenu, currentUserRole),
+    [currentUserRole],
+  );
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
+  const activeOpen = useMemo(() => {
     const initialOpen: Record<string, boolean> = {};
-    sidebarMenu.forEach((item) => {
-      if (item.subMenu) {
-        const hasActiveChild = item.subMenu.some((sub) =>
-          pathname.startsWith(sub.path as string),
-        );
-        if (hasActiveChild) initialOpen[item.title] = true;
-      }
+
+    visibleMenu.forEach((item) => {
+      if (!item.subMenu) return;
+
+      const hasActiveChild = item.subMenu.some((sub) =>
+        pathname.startsWith(sub.path as string),
+      );
+
+      if (hasActiveChild) initialOpen[item.title] = true;
     });
-    setOpen(initialOpen);
-  }, [mounted, pathname]);
+
+    return initialOpen;
+  }, [pathname, visibleMenu]);
+
+  const open = { ...activeOpen, ...manualOpen };
 
   const toggle = (key: string) => {
-    setOpen((prev) => ({ ...prev, [key]: !prev[key] }));
+    setManualOpen((prev) => ({ ...prev, [key]: !open[key] }));
   };
 
-  const isParentActive = (item: (typeof sidebarMenu)[number]) => {
+  const isParentActive = (item: (typeof visibleMenu)[number]) => {
     if (item.subMenu) {
       return item.subMenu.some((sub) =>
         pathname.startsWith(sub.path as string),
@@ -61,11 +87,9 @@ export default function DashboardSidebar() {
 
   const isSubActive = (path: string) => pathname.startsWith(path);
 
-  if (!mounted) return null;
-
   return (
     <Sidebar collapsible="icon">
-      <SidebarContent className="flex flex-col h-full items-center">
+      <SidebarContent className="flex h-full flex-col items-center">
         {!isCollapsed && (
           <SidebarHeader>
             <h1 className="text-lg font-bold">Cahaya Admin</h1>
@@ -73,7 +97,7 @@ export default function DashboardSidebar() {
         )}
         <SidebarSeparator />
         <SidebarMenu className="flex-1">
-          {sidebarMenu.map((item) => {
+          {visibleMenu.map((item) => {
             const hasSubmenu = !!item.subMenu;
             const parentActive = isParentActive(item);
 
@@ -87,14 +111,14 @@ export default function DashboardSidebar() {
                       isCollapsed ? "justify-center" : ""
                     } ${
                       parentActive
-                        ? "bg-primary/10 text-primary font-semibold hover:bg-primary/15"
+                        ? "bg-primary/10 font-semibold text-primary hover:bg-primary/15"
                         : ""
                     }`}
                   >
                     {!hasSubmenu && item.path ? (
                       <Link
                         href={item.path as string}
-                        className={`flex items-center ${isCollapsed ? "justify-center w-full" : ""}`}
+                        className={`flex items-center ${isCollapsed ? "w-full justify-center" : ""}`}
                       >
                         {item.icon && (
                           <item.icon
@@ -137,7 +161,7 @@ export default function DashboardSidebar() {
                             asChild
                             className={`transition-colors ${
                               subActive
-                                ? "bg-primary/10 text-primary font-semibold hover:bg-primary/15"
+                                ? "bg-primary/10 font-semibold text-primary hover:bg-primary/15"
                                 : ""
                             }`}
                           >
@@ -168,7 +192,7 @@ export default function DashboardSidebar() {
             <SidebarMenuItem>
               <SidebarMenuButton
                 type="submit"
-                className={`w-full flex flex-row items-center text-red-600 hover:bg-red-50 ${
+                className={`flex w-full flex-row items-center text-red-600 hover:bg-red-50 ${
                   isCollapsed ? "justify-center gap-0" : "gap-4"
                 }`}
               >
