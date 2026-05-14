@@ -14,6 +14,7 @@ export function paymentStatusLabel(status: string) {
   const labels: Record<string, string> = {
     pending: "Pending",
     paid: "Dibayar",
+    awaiting_verification: "Menunggu Verifikasi",
     confirmed: "Terkonfirmasi",
     rejected: "Ditolak",
   };
