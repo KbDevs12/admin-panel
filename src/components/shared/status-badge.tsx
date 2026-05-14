@@ -28,7 +28,8 @@ export function toneFromStatus(
   status: string,
 ): "default" | "success" | "warning" | "danger" {
   if (["confirmed", "paid", "completed"].includes(status)) return "success";
-  if (["pending", "pending_payment"].includes(status)) return "warning";
+  if (["pending", "pending_payment", "awaiting_verification"].includes(status))
+    return "warning";
   if (["cancelled", "rejected"].includes(status)) return "danger";
   return "default";
 }
