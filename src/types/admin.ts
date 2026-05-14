@@ -5,7 +5,12 @@ export type BookingStatus =
   | "cancelled"
   | "completed";
 
-export type PaymentStatus = "pending" | "paid" | "confirmed" | "rejected";
+export type PaymentStatus =
+  | "pending"
+  | "awaiting_verification"
+  | "paid"
+  | "confirmed"
+  | "rejected";
 
 export interface AdminBookingSummary {
   id: string;
@@ -41,6 +46,10 @@ export interface AdminPaymentSummary {
   paid_at?: string | null;
   confirmed_at?: string | null;
   confirmed_by?: string | null;
+  proof_image_url?: string | null;
+  proof_object_key?: string | null;
+  proof_note?: string | null;
+  submitted_at?: string | null;
   booking_status: BookingStatus;
   date: string;
   start_time: string;
