@@ -14,7 +14,10 @@ export default async function PaymentsPage({
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Payments" description="Monitoring dan konfirmasi pembayaran." />
+      <PageHeader
+        title="Payments"
+        description="Monitoring dan konfirmasi pembayaran."
+      />
       <FilterBar
         showSearch
         defaultQ={params.q}
@@ -22,6 +25,7 @@ export default async function PaymentsPage({
         defaultDate={params.date}
         statusOptions={[
           { value: "pending", label: "Pending" },
+          { value: "awaiting_verification", label: "Menunggu Verifikasi" },
           { value: "paid", label: "Paid" },
           { value: "confirmed", label: "Confirmed" },
           { value: "rejected", label: "Rejected" },
