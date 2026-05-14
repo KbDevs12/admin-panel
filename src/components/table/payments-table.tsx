@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Eye } from "lucide-react";
+import { Eye, ImageIcon } from "lucide-react";
 import { createColumnHelper, type ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/shared/data-table";
@@ -18,7 +18,9 @@ const columns = [
     cell: (info) => (
       <div>
         <div className="font-medium">{info.getValue()}</div>
-        <div className="text-xs text-muted-foreground">{info.row.original.customer_email}</div>
+        <div className="text-xs text-muted-foreground">
+          {info.row.original.customer_email}
+        </div>
       </div>
     ),
   }),
@@ -30,7 +32,8 @@ const columns = [
         <div>
           <div className="font-medium">{info.getValue()}</div>
           <div className="text-xs text-muted-foreground">
-            {payment.date} · {payment.start_time.slice(0, 5)}-{payment.end_time.slice(0, 5)}
+            {payment.date} · {payment.start_time.slice(0, 5)}-
+            {payment.end_time.slice(0, 5)}
           </div>
         </div>
       );
@@ -44,9 +47,34 @@ const columns = [
       </StatusBadge>
     ),
   }),
+  col.display({
+    id: "proof",
+    header: "Bukti",
+    enableSorting: false,
+    cell: (info) => {
+      const proofUrl = info.row.original.proof_image_url;
+      if (!proofUrl) {
+        return <span className="text-xs text-muted-foreground">Belum ada</span>;
+      }
+      return (
+        <a
+          href={proofUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs font-medium hover:bg-muted"
+        >
+          <ImageIcon className="size-3" /> Lihat
+        </a>
+      );
+    },
+  }),
   col.accessor("amount", {
     header: "Amount",
-    cell: (info) => <div className="text-right tabular-nums">{FormatRupiah(info.getValue())}</div>,
+    cell: (info) => (
+      <div className="text-right tabular-nums">
+        {FormatRupiah(info.getValue())}
+      </div>
+    ),
   }),
   col.display({
     id: "actions",
