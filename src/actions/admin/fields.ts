@@ -82,6 +82,29 @@ export async function deleteField(payload: { id: string }) {
   return res;
 }
 
+export async function deleteSchedule(payload: {
+  field_id: string;
+  date: string;
+}) {
+  if (!payload.field_id || !payload.date) {
+    return {
+      ok: false,
+      status: 400,
+      success: false,
+      message: "Field ID dan tanggal jadwal wajib diisi",
+      data: undefined,
+    };
+  }
+
+  const res = await api(
+    ENDPOINTS.ADMIN.FIELD_SCHEDULE(payload.field_id, payload.date),
+    { method: "DELETE" },
+  );
+
+  if (res.ok) revalidatePath(`/fields/${payload.field_id}`);
+  return res;
+}
+
 export async function upsertSchedule(payload: FieldScheduleInput) {
   const parsed = FieldScheduleSchema.safeParse(payload);
   if (!parsed.success) {
