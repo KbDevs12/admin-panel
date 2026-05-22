@@ -33,7 +33,7 @@ export const ENDPOINTS = {
     FIELD_DETAIL: (id: string) => `/api/v1/admin/fields/${id}`,
     FIELD_SCHEDULES: (id: string) => `/api/v1/admin/fields/${id}/schedules`,
     FIELD_SCHEDULE: (id: string, date: string) =>
-      `/api/v1/admin/fields/${id}/schedules/${date}`,
+      `/api/v1/admin/fields/${id}/schedules/${encodeURIComponent(date)}`,
 
     DAILY_REPORT: "/api/v1/admin/reports/daily",
     RANGE_REPORT: "/api/v1/admin/reports/range",
